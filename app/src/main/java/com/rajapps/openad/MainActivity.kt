@@ -1,56 +1,55 @@
-package com.rajapps.openad;
+package com.rajapps.openad
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.appopen.AppOpenAd
+import com.google.android.gms.ads.appopen.AppOpenAd.AppOpenAdLoadCallback
 
-import android.os.Bundle;
-
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.LoadAdError;
-import com.google.android.gms.ads.appopen.AppOpenAd;
-
-public class MainActivity extends AppCompatActivity {
+class MainActivity : AppCompatActivity() {
+    private var mAppOpenAd: AppOpenAd? = null
+    private var isShowingAd = false
 
 
-    private AppOpenAd mAppOpenAd;
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
 
-    private boolean isShowingAd = false;
-    private void showOpenAd(){
 
-        AdRequest adRequest = new AdRequest.Builder().build();
-        AppOpenAd.load(this, "ca-app-pub-3940256099942544/3419835294",
-                adRequest,
-                AppOpenAd.APP_OPEN_AD_ORIENTATION_PORTRAIT,
-                new AppOpenAd.AppOpenAdLoadCallback() {
-                    @Override
-                    public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                        super.onAdFailedToLoad(loadAdError);
-                    }
 
-                    @Override
-                    public void onAdLoaded(@NonNull AppOpenAd appOpenAd) {
-                        super.onAdLoaded(appOpenAd);
-                        mAppOpenAd = appOpenAd;
-
-                        if(!isShowingAd) {
-                            mAppOpenAd.show(MainActivity.this);
-                            isShowingAd = true;
-                        }
-                    }
-                });
     }
-    @Override
-    protected void onResume() {
-        super.onResume();
 
-        if(!isShowingAd) {
-            showOpenAd();
+
+
+    private fun showOpenAd() {
+        val adRequest = AdRequest.Builder().build()
+        AppOpenAd.load(this, "ca-app-pub-3940256099942544/3419835294",
+            adRequest,
+            AppOpenAd.APP_OPEN_AD_ORIENTATION_PORTRAIT,
+            object : AppOpenAdLoadCallback() {
+                override fun onAdFailedToLoad(loadAdError: LoadAdError) {
+                    super.onAdFailedToLoad(loadAdError)
+                }
+
+                override fun onAdLoaded(appOpenAd: AppOpenAd) {
+                    super.onAdLoaded(appOpenAd)
+                    mAppOpenAd = appOpenAd
+                    if (!isShowingAd) {
+                        mAppOpenAd!!.show(this@MainActivity)
+                        isShowingAd = true
+                    }
+                }
+            })
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (!isShowingAd) {
+            showOpenAd()
         }
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-    }
+
+
 }
